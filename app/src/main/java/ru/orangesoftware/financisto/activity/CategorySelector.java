@@ -11,15 +11,10 @@ package ru.orangesoftware.financisto.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.v4.util.Pair;
+import android.text.InputType;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.TextView;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import android.widget.*;
 import ru.orangesoftware.financisto.R;
 import ru.orangesoftware.financisto.db.DatabaseAdapter;
 import ru.orangesoftware.financisto.db.DatabaseHelper;
@@ -31,6 +26,13 @@ import ru.orangesoftware.financisto.utils.TransactionUtils;
 import ru.orangesoftware.financisto.view.AttributeView;
 import ru.orangesoftware.financisto.view.AttributeViewFactory;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
+
 public class CategorySelector {
 
     private final Activity activity;
@@ -38,6 +40,8 @@ public class CategorySelector {
     private final ActivityLayout x;
 
     private TextView categoryText;
+    private AutoCompleteTextView filterAutoCompleteTxt;
+    private SimpleCursorAdapter autoCompleteAdapter;
     private Cursor categoryCursor;
     private ListAdapter categoryAdapter;
     private LinearLayout attributesLayout;
@@ -87,7 +91,9 @@ public class CategorySelector {
     public void createNode(LinearLayout layout, SelectorType type) {
         switch (type) {
             case TRANSACTION:
-                categoryText = x.addListNodeCategory(layout);
+                Pair<TextView, AutoCompleteTextView> nodes = x.addListNodeCategory(layout, R.id.category_filter_toggle);
+                categoryText = nodes.first;
+                filterAutoCompleteTxt = nodes.second;
                 break;
             case SPLIT:
             case TRANSFER:
@@ -102,8 +108,27 @@ public class CategorySelector {
             default:
                 throw new IllegalArgumentException("unknown type: " + type);
         }
-
         categoryText.setText(R.string.no_category);
+    }
+
+    private void initAutoCompleteFilter(final AutoCompleteTextView filterTxt) { // init only after it's toggled
+        autoCompleteAdapter = TransactionUtils.createCategoryFilterAdapter(activity, db);
+        filterTxt.setInputType(InputType.TYPE_CLASS_TEXT 
+                        | InputType.TYPE_TEXT_FLAG_CAP_WORDS 
+                        | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                        | InputType.TYPE_TEXT_VARIATION_FILTER);
+        filterTxt.setThreshold(1);
+        filterTxt.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                filterTxt.setAdapter(requireNonNull(autoCompleteAdapter));
+                filterTxt.selectAll();
+            }
+        });
+        filterTxt.setOnItemClickListener((parent, view, position, id) -> {
+            selectCategory(id, false);
+            ToggleButton toggleBtn = (ToggleButton) filterTxt.getTag();
+            toggleBtn.performClick();
+        });
     }
 
     public void createDummyNode() {
@@ -126,6 +151,9 @@ public class CategorySelector {
             }
             case R.id.category_split:
                 selectCategory(Category.SPLIT_CATEGORY_ID);
+                break;
+            case R.id.category_filter_toggle:
+                if (autoCompleteAdapter == null) initAutoCompleteFilter(filterAutoCompleteTxt);
                 break;
         }
     }
@@ -219,6 +247,10 @@ public class CategorySelector {
 
     public boolean isSplitCategorySelected() {
         return Category.isSplit(selectedCategoryId);
+    }
+
+    public void onDestroy() {
+        if (autoCompleteAdapter != null) autoCompleteAdapter.changeCursor(null);
     }
 
     public interface CategorySelectorListener {

@@ -10,14 +10,14 @@ package ru.orangesoftware.financisto.activity;
 
 import android.app.Activity;
 import android.widget.ListAdapter;
-
-import java.util.List;
-
+import android.widget.SimpleCursorAdapter;
 import ru.orangesoftware.financisto.R;
 import ru.orangesoftware.financisto.db.MyEntityManager;
 import ru.orangesoftware.financisto.model.MyLocation;
 import ru.orangesoftware.financisto.utils.MyPreferences;
 import ru.orangesoftware.financisto.utils.TransactionUtils;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,7 +28,7 @@ public class LocationSelector extends MyEntitySelector<MyLocation> {
 
     public LocationSelector(Activity activity, MyEntityManager em, ActivityLayout x) {
         super(activity, em, x, MyPreferences.isShowLocation(activity),
-                R.id.location, R.id.location_add, R.string.location, R.string.current_location);
+                R.id.location, R.id.location_add, R.string.location, R.string.current_location, R.id.location_filter_toggle);
     }
 
     @Override
@@ -43,7 +43,12 @@ public class LocationSelector extends MyEntitySelector<MyLocation> {
 
     @Override
     protected ListAdapter createAdapter(Activity activity, List<MyLocation> entities) {
-        return TransactionUtils.createLocarionAdapter(activity, entities);
+        return TransactionUtils.createLocationAdapter(activity, entities);
+    }
+
+    @Override
+    protected SimpleCursorAdapter createFilterAdapter() {
+        return TransactionUtils.createLocationAutoCompleteAdapter(activity, em);
     }
 
 }
