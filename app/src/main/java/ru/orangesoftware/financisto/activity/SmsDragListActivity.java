@@ -4,13 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +17,6 @@ import ru.orangesoftware.financisto.adapter.async.SmsTemplateListAsyncAdapter;
 import ru.orangesoftware.financisto.adapter.async.SmsTemplateListSource;
 import ru.orangesoftware.financisto.adapter.dragndrop.SimpleItemTouchHelperCallback;
 import ru.orangesoftware.financisto.db.DatabaseAdapter;
-import ru.orangesoftware.financisto.utils.StringUtil;
 
 /**
  * todo.mb: 3) empty splash when no sms-templates added 
@@ -103,38 +99,38 @@ public class SmsDragListActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.draglist_menu, menu);
-
-        final MenuItem searchItem = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            /**
-             * Not sense doing via android.widget.Filter as adapter and its data is filtered in async mode 
-             */
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                cursorSource.setConstraint(newText);
-                adapter.reloadAsyncSource();
-                
-                if (!StringUtil.isEmpty(newText)) {
-                    Log.i(TAG, "filtered by `" + newText + "`");
-//                    Toast.makeText(SmsDragListActivity.this, "filtered by '" + newText + "'", Toast.LENGTH_SHORT).show();
-                }
-                return true;
-            }
-        });
-
-        final MenuItem newItem = menu.findItem(R.id.new_sms_template);
-        newItem.setOnMenuItemClickListener(this::addItem);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.draglist_menu, menu);
+//
+//        final MenuItem searchItem = menu.findItem(R.id.action_search);
+//        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                return false;
+//            }
+//
+//            /**
+//             * Not sense doing via android.widget.Filter as adapter and its data is filtered in async mode 
+//             */
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                cursorSource.setConstraint(newText);
+//                adapter.reloadAsyncSource();
+//                
+//                if (!StringUtil.isEmpty(newText)) {
+//                    Log.i(TAG, "filtered by `" + newText + "`");
+////                    Toast.makeText(SmsDragListActivity.this, "filtered by '" + newText + "'", Toast.LENGTH_SHORT).show();
+//                }
+//                return true;
+//            }
+//        });
+//
+//        final MenuItem newItem = menu.findItem(R.id.new_sms_template);
+//        newItem.setOnMenuItemClickListener(this::addItem);
+//        return true;
+//    }
 
     private boolean addItem(MenuItem menuItem) {
         Intent intent = new Intent(this, SmsTemplateActivity.class);

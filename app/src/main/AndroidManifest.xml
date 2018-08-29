@@ -289,7 +289,7 @@
         <activity
             android:name=".activity.SmsDragListActivity"
             android:label="@string/sms_templates"
-            android:theme="@style/Theme.AppCompat"
+            android:theme="@style/Theme.AppCompat.Dialog"
         />
 
         <activity

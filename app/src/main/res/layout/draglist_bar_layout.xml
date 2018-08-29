@@ -4,9 +4,18 @@
         a:layout_width="match_parent"
         a:layout_height="match_parent">
 
+        <LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
+                      a:layout_width="fill_parent" a:layout_height="wrap_content"
+                      a:orientation="vertical" a:id="@+id/list">
+                
+        <android.support.v7.widget.SearchView
+                a:id="@+id/search_bar"
+                a:layout_height="wrap_content"
+                a:layout_width="match_parent"/>
+        
         <android.support.v7.widget.RecyclerView
                 a:id="@+id/drag_list_view"
-                a:layout_width="match_parent"
+                a:layout_width="wrap_content"
                 a:layout_height="wrap_content"/>
 
         <TextView
@@ -16,4 +25,5 @@
                 a:gravity="center"
                 a:visibility="gone"
                 a:text="@string/no_sms_templates" />
+        </LinearLayout>
 </FrameLayout>
