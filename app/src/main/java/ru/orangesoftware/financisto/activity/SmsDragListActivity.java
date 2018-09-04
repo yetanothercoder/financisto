@@ -18,9 +18,6 @@ import ru.orangesoftware.financisto.adapter.async.SmsTemplateListSource;
 import ru.orangesoftware.financisto.adapter.dragndrop.SimpleItemTouchHelperCallback;
 import ru.orangesoftware.financisto.db.DatabaseAdapter;
 
-/**
- * todo.mb: 3) empty splash when no sms-templates added 
- */
 public class SmsDragListActivity extends AppCompatActivity {
 
     private static final String TAG = "Financisto." + SmsDragListActivity.class.getSimpleName();

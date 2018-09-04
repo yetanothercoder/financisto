@@ -41,7 +41,6 @@ public class BudgetActivity extends AbstractActivity {
     private AmountInput amountInput;
 
     private EditText titleText;
-    private TextView categoryText;
     private TextView accountText;
     private TextView periodRecurText;
     private CheckBox cbMode;
@@ -83,7 +82,7 @@ public class BudgetActivity extends AbstractActivity {
         accountText = x.addListNode(layout, R.id.account,
                 R.string.account, R.string.select_account);
 
-        categoryText = categorySelector.createNode(layout, FILTER);
+        categorySelector.createNode(layout, FILTER);
         
         projectSelector.createNode(layout);
         cbIncludeSubCategories = x.addCheckboxNode(layout,
@@ -249,6 +248,7 @@ public class BudgetActivity extends AbstractActivity {
         switch (id) {
             case R.id.category:
                 categorySelector.onSelectedId(id, selectedId);
+                categorySelector.fillCategoryInUI();
                 break;
             case R.id.project:
                 projectSelector.onSelectedId(id, selectedId);
@@ -303,7 +303,7 @@ public class BudgetActivity extends AbstractActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                // todo.mb: not much sense for adding new category & project in budget
+                // todo.mb: not much sense for adding new category & project in budget, remove then >>
                 /*case NEW_CATEGORY_REQUEST:
                     categories = MyEntitySelector.merge(categories, db.getCategoriesList(true));
                     break;
@@ -322,6 +322,14 @@ public class BudgetActivity extends AbstractActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        if (projectSelector != null) projectSelector.onDestroy();
+        if (categorySelector != null) categorySelector.onDestroy();
+        super.onDestroy();
+    }
+    
+    
     private static class AccountOption {
 
         public final String title;
@@ -351,5 +359,5 @@ public class BudgetActivity extends AbstractActivity {
         }
 
     }
-
+    
 }
