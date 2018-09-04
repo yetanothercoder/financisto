@@ -377,7 +377,8 @@
             android:name=".activity.SelectTemplateActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/transaction_templates"
-            android:theme="@android:style/Theme.Dialog" />
+            android:theme="@style/Theme.AppCompat.Dialog" 
+        />
 
         <activity
             android:name=".activity.CsvExportActivity"

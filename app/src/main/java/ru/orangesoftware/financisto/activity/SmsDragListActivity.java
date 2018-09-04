@@ -96,6 +96,7 @@ public class SmsDragListActivity extends AppCompatActivity {
         }
     }
 
+    // todo.mb: restore this back then >>
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        getMenuInflater().inflate(R.menu.draglist_menu, menu);
@@ -138,11 +139,6 @@ public class SmsDragListActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
