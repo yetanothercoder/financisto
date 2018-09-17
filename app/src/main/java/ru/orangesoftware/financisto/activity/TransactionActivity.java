@@ -169,11 +169,6 @@ public class TransactionActivity extends AbstractTransactionActivity {
         isShowPayee = MyPreferences.isShowPayee(this);
         if (isShowPayee) {
             createPayeeNode(layout);
-            payeeText.setOnItemClickListener((adapterView, view, i, id) -> {
-                if (isRememberLastCategory) {
-                    selectLastCategoryForPayee(id);
-                }
-            });
         }
         //category
         categorySelector.createNode(layout, TRANSACTION);
@@ -308,7 +303,9 @@ public class TransactionActivity extends AbstractTransactionActivity {
             rateView.setFromAmount(transaction.originalFromAmount);
             rateView.setToAmount(transaction.fromAmount);
         } else {
-            rateView.setFromAmount(transaction.fromAmount);
+            if (transaction.fromAmount != 0) {
+                rateView.setFromAmount(transaction.fromAmount);
+            }
         }
     }
 
@@ -411,6 +408,11 @@ public class TransactionActivity extends AbstractTransactionActivity {
         switch (id) {
             case R.id.currency:
                 selectOriginalCurrency(selectedId);
+                break;
+            case R.id.payee:
+                if (isRememberLastCategory) {
+                    selectLastCategoryForPayee(id);
+                }
                 break;
         }
     }
@@ -603,14 +605,6 @@ public class TransactionActivity extends AbstractTransactionActivity {
             return selectedAccount.currency;
         }
         return Currency.EMPTY;
-    }
-
-    @Override
-    protected void onDestroy() {
-        Log.d("Financisto", "TransactionActivity.onDestroy");
-        if (payeeAdapter != null) payeeAdapter.changeCursor(null);
-        if (categorySelector != null) categorySelector.onDestroy();
-        super.onDestroy();
     }
 
     private static class ActivityState implements Serializable {

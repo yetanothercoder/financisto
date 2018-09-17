@@ -25,11 +25,15 @@ import java.util.List;
  * User: denis.solonenko
  * Date: 7/2/12 9:25 PM
  */
-public class ProjectSelector extends MyEntitySelector<Project> {
+public class ProjectSelector<A extends AbstractActivity> extends MyEntitySelector<Project, A> {
 
-    public ProjectSelector(Activity activity, DatabaseAdapter db, ActivityLayout x) {
-        super(activity, db, x, MyPreferences.isShowProject(activity),
-                R.id.project, R.id.project_add, R.string.project, R.string.no_project, R.id.project_filter_toggle);
+    public ProjectSelector(A activity, DatabaseAdapter db, ActivityLayout x) {
+        this(activity, db, x, R.id.project_add, R.id.project_clear, R.string.no_project);
+    }
+    
+    public ProjectSelector(A activity, DatabaseAdapter db, ActivityLayout x, int actBtnId, int clearBtnId, int emptyId) {
+        super(activity, db, x, MyPreferences.isShowProject(activity), 
+                R.id.project, actBtnId, clearBtnId, R.string.project, emptyId, R.id.project_filter_toggle);
     }
 
     @Override
@@ -39,7 +43,7 @@ public class ProjectSelector extends MyEntitySelector<Project> {
 
     @Override
     protected List<Project> fetchEntities(MyEntityManager em) {
-        return em.getActiveProjectsList(true);
+        return em.getActiveProjectsList(!isMultiSelect());
     }
 
     @Override

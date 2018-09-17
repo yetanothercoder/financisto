@@ -23,6 +23,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import ru.orangesoftware.financisto.BuildConfig;
 import ru.orangesoftware.financisto.R;
 import ru.orangesoftware.financisto.utils.PicturesUtil;
+import ru.orangesoftware.financisto.utils.Utils;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -136,6 +137,13 @@ public class NodeInflater {
             return this;
         }
 
+        public ListBuilder withClearButtonId(int buttonId, OnClickListener listener) {
+            ImageView plusImageView = v.findViewById(R.id.bMinus);
+            plusImageView.setId(buttonId);
+            plusImageView.setOnClickListener(listener);
+            return this;
+        }
+
         public ListBuilder withAutoCompleteFilter(OnClickListener listener, int toggleId) {
             final AutoCompleteTextView autoCompleteTxt = v.findViewById(R.id.autocomplete_filter);
             autoCompleteTxt.setFocusableInTouchMode(true);
@@ -145,15 +153,16 @@ public class NodeInflater {
             toggleBtn.setOnClickListener(v1 -> {
                 listener.onClick(v1);
                 boolean filterVisible = toggleBtn.isChecked();
-                
-                if (filterVisible) {
-                    autoCompleteTxt.setText("");
-                    autoCompleteTxt.requestFocus();
-                }
+
                 autoCompleteTxt.setVisibility(filterVisible ? VISIBLE : GONE);
                 v.findViewById(R.id.list_node_row).setVisibility(filterVisible ? GONE : VISIBLE);
-            }
-            );
+                if (filterVisible) {
+                    autoCompleteTxt.setText("");
+                    Utils.openSoftKeyboard(autoCompleteTxt, layout.getContext());
+                } else {
+                    Utils.closeSoftKeyboard(autoCompleteTxt, layout.getContext());
+                }
+            });
 
             return this;
         }
@@ -162,7 +171,6 @@ public class NodeInflater {
             v.findViewById(R.id.more).setVisibility(GONE);
             return this;
         }
-
     }
 
     public class CheckBoxBuilder extends Builder {

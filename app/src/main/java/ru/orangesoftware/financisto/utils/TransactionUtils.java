@@ -14,14 +14,19 @@ import android.content.Context;
 import android.database.Cursor;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
+
+import java.util.List;
+
 import ru.orangesoftware.financisto.adapter.CategoryListAdapter;
 import ru.orangesoftware.financisto.adapter.MyEntityAdapter;
 import ru.orangesoftware.financisto.db.DatabaseAdapter;
 import ru.orangesoftware.financisto.db.DatabaseHelper.AccountColumns;
 import ru.orangesoftware.financisto.db.MyEntityManager;
-import ru.orangesoftware.financisto.model.*;
-
-import java.util.List;
+import ru.orangesoftware.financisto.model.Currency;
+import ru.orangesoftware.financisto.model.MyEntity;
+import ru.orangesoftware.financisto.model.MyLocation;
+import ru.orangesoftware.financisto.model.Payee;
+import ru.orangesoftware.financisto.model.Project;
 
 public class TransactionUtils {
 
@@ -70,7 +75,17 @@ public class TransactionUtils {
 	}
 
     public static SimpleCursorAdapter createPayeeAutoCompleteAdapter(Context context, final MyEntityManager db) {
-        return new FilterSimpleCursorAdapter<>(context, db, Payee.class);
+        return new FilterSimpleCursorAdapter<MyEntityManager, Payee>(context, db, Payee.class) {
+            @Override
+            Cursor filterRows(CharSequence constraint) {
+                return db.filterAllEntities(Payee.class, constraint.toString());
+            }
+
+            @Override
+            Cursor getAllRows() {
+                return db.filterAllEntities(Payee.class, null);
+            }
+        };
     }
 
     public static SimpleCursorAdapter createProjectAutoCompleteAdapter(Context context, final MyEntityManager db) {
@@ -79,6 +94,11 @@ public class TransactionUtils {
 
     public static SimpleCursorAdapter createLocationAutoCompleteAdapter(Context context, final MyEntityManager db) {
         return new FilterSimpleCursorAdapter<MyEntityManager, MyLocation>(context, db, MyLocation.class){
+            @Override
+            Cursor filterRows(CharSequence constraint) {
+                return db.filterAllEntities(MyLocation.class, constraint.toString());
+            }
+
             @Override
             Cursor getAllRows() {
                 return db.getAllLocations(false);
@@ -99,7 +119,7 @@ public class TransactionUtils {
             }
         };
     }
-    
+
     static class FilterSimpleCursorAdapter<T extends MyEntityManager, E extends MyEntity> extends SimpleCursorAdapter {
         private final T db;
         private final String filterColumn;
@@ -124,7 +144,7 @@ public class TransactionUtils {
 
         @Override
         public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
-            if (constraint == null) {
+            if (constraint == null || StringUtil.isEmpty(constraint.toString())) {
                 return getAllRows();
             } else {
                 return filterRows(constraint);
@@ -132,11 +152,11 @@ public class TransactionUtils {
         }
 
         Cursor filterRows(CharSequence constraint) {
-            return db.getAllEntitiesLike(constraint, entityClass);
+            return db.filterActiveEntities(entityClass, constraint.toString());
         }
 
         Cursor getAllRows() {
-            return db.getAllEntities(entityClass);
+            return db.filterActiveEntities(entityClass, null);
         }
     }
 }
