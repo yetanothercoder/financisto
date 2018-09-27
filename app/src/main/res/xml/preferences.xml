@@ -226,6 +226,12 @@
             android:key="sms_transaction_note"
             android:summary="@string/pref_sms_adding_to_note"
             android:title="@string/pref_sms_adding_to_note_title" />
+        <EditTextPreference
+            android:inputType="numberDecimal"
+            android:defaultValue="1"
+            android:key="diff_limit"
+            android:summary="Summary..."
+            android:title="Diff Limit" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/protection">
