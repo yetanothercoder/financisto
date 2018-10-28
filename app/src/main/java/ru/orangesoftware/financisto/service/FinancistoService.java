@@ -19,9 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
-import java.util.Date;
-
+import android.util.Pair;
 import ru.orangesoftware.financisto.R;
 import ru.orangesoftware.financisto.activity.AbstractTransactionActivity;
 import ru.orangesoftware.financisto.activity.AccountWidget;
@@ -36,6 +34,8 @@ import ru.orangesoftware.financisto.model.TransactionInfo;
 import ru.orangesoftware.financisto.model.TransactionStatus;
 import ru.orangesoftware.financisto.recur.NotificationOptions;
 import ru.orangesoftware.financisto.utils.MyPreferences;
+
+import java.util.Date;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static ru.orangesoftware.financisto.service.DailyAutoBackupScheduler.scheduleNextAutoBackup;
@@ -110,12 +110,20 @@ public class FinancistoService extends JobIntentService {
         String number = intent.getStringExtra(SMS_TRANSACTION_NUMBER);
         String body = intent.getStringExtra(SMS_TRANSACTION_BODY);
         if (number != null && body != null) {
-            Transaction t = smsProcessor.createTransactionBySmsAndCorrect(number, body, getSmsTransactionStatus(this),
-                shouldSaveSmsToTransactionNote(this), 1).first; // todo.mb: get threshold from prefs
-            if (t != null) {
-                TransactionInfo transactionInfo = db.getTransactionInfo(t.id);
-                Notification notification = createSmsTransactionNotification(transactionInfo, number);
-                notifyUser(notification, (int) t.id);
+            Pair<Transaction, Transaction> results = smsProcessor.createTransactionBySmsAndCorrect(number, body, getSmsTransactionStatus(this),
+                    shouldSaveSmsToTransactionNote(this), 1); // todo.mb: get threshold from prefs
+            if (results != null) {
+                Transaction t;
+                if ((t = results.first) != null) {
+                    TransactionInfo transactionInfo = db.getTransactionInfo(t.id);
+                    Notification notification = createSmsTransactionNotification(transactionInfo, number);
+                    notifyUser(notification, (int) t.id);
+                }
+                if ((t = results.second) != null) {
+                    TransactionInfo transactionInfo = db.getTransactionInfo(t.id);
+                    Notification notification = createSmsCorrectionNotification(transactionInfo, number);
+                    notifyUser(notification, (int) t.id);
+                }
                 AccountWidget.updateWidgets(this);
             }
         }
@@ -214,6 +222,14 @@ public class FinancistoService extends JobIntentService {
     private Notification createSmsTransactionNotification(TransactionInfo t, String number) {
         String tickerText = getString(R.string.new_sms_transaction_text, number);
         String contentTitle = getString(R.string.new_sms_transaction_title, number);
+        String text = t.getNotificationContentText(this);
+
+        return generateNotification(t, tickerText, contentTitle, text);
+    }
+
+    private Notification createSmsCorrectionNotification(TransactionInfo t, String number) {
+        String tickerText = getString(R.string.new_sms_correction_text, number);
+        String contentTitle = getString(R.string.new_sms_correction_title, number);
         String text = t.getNotificationContentText(this);
 
         return generateNotification(t, tickerText, contentTitle, text);
