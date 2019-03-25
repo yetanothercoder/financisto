@@ -38,7 +38,7 @@
 		a:id="@+id/list_node_row">
 		
 		<RelativeLayout a:layout_width="0dp" 
-						a:layout_height="wrap_content" 
+						a:layout_height="wrap_content"
 						a:layout_marginStart="8dip"
 						a:layout_marginTop="3dip" 
 						a:layout_marginBottom="3dip"

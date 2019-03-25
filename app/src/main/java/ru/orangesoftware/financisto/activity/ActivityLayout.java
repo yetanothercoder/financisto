@@ -15,15 +15,33 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.support.v4.util.Pair;
+import android.view.Menu;
 import android.view.View;
-import android.widget.*;
+import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.PopupMenu;
+import android.widget.TextView;
+import android.widget.ToggleButton;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import ru.orangesoftware.financisto.R;
 import ru.orangesoftware.financisto.model.MultiChoiceItem;
+import ru.orangesoftware.financisto.utils.MenuItemInfo;
 import ru.orangesoftware.financisto.utils.Utils;
 import ru.orangesoftware.financisto.view.NodeInflater;
-import ru.orangesoftware.financisto.view.NodeInflater.*;
+import ru.orangesoftware.financisto.view.NodeInflater.Builder;
+import ru.orangesoftware.financisto.view.NodeInflater.CheckBoxBuilder;
+import ru.orangesoftware.financisto.view.NodeInflater.EditBuilder;
+import ru.orangesoftware.financisto.view.NodeInflater.ListBuilder;
+import ru.orangesoftware.financisto.view.NodeInflater.PictureBuilder;
 
-import java.util.List;
+import static ru.orangesoftware.financisto.activity.AbstractListActivity.MENU_EDIT;
+import static ru.orangesoftware.financisto.activity.AbstractListActivity.MENU_VIEW;
 
 public class ActivityLayout {
 
@@ -204,7 +222,7 @@ public class ActivityLayout {
 		return Pair.create(textView, filterTxt);
 	}
 
-	public Pair<TextView, AutoCompleteTextView> addListNodeCategory(LinearLayout layout, int filterToggleId) {
+	public Pair<TextView, AutoCompleteTextView> addListNodeCategory(LinearLayout layout, Context activity, int filterToggleId) {
 		ListBuilder b = inflater.new ListBuilder(layout, R.layout.select_entry_category);
 		View v = b.withButtonId(R.id.category_add, listener)
 				.withClearButtonId(R.id.category_clear, listener)
@@ -221,6 +239,31 @@ public class ActivityLayout {
 		filterTxt.setTag(toggleBtn);
 		TextView entityNameTxt = v.findViewById(R.id.data);
 		entityNameTxt.setTag(R.id.bMinus, v.findViewById(R.id.category_clear));
+		v.setLongClickable(true);
+		v.setOnLongClickListener(v1 -> {
+
+			PopupMenu popupMenu = new PopupMenu(activity, v);
+			Menu menu = popupMenu.getMenu();
+
+			List<MenuItemInfo> menus = new LinkedList<>();
+			menus.add(new MenuItemInfo(MENU_VIEW, R.string.view));
+			menus.add(new MenuItemInfo(MENU_EDIT, R.string.edit));
+
+			int i = 0;
+			for (MenuItemInfo m : menus) {
+				if (m.enabled) {
+					menu.add(0, m.menuId, i++, m.titleId);
+				}
+			}
+			popupMenu.setOnMenuItemClickListener(item -> {
+				System.out.println(v1.getId() + " id on 777 Menu item:" + item);
+				return true;
+			});
+			popupMenu.show();
+
+			System.out.println("!!! 777, view:" + v1);
+			return true;
+		});
 		return Pair.create(entityNameTxt, filterTxt);
 	}
 
